@@ -1,18 +1,23 @@
 package main
 
 import (
-	"errors"
+	"bufio"
 	"fmt"
+	"os"
 )
-func prossesTracking( ) error {
-	fmt.Println("Process Tracking")
-	names := []string{"Alice", "Bob", "Charlie"}
-	for index, value := range names {
-		fmt.Printf("the valeu of index %d is %s\n", index, value)
-	}
-	return errors.New("Process Tracking Error")
-}
+
 func main() {
-	prossesTracking()
-	
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Print("Enter your name: ")
+
+	// Scan the input
+	scanner.Scan()
+	FirstName := scanner.Text()
+	fmt.Print("Enter your name: ")
+
+	// Scan the input
+	scanner.Scan()
+	LastName := scanner.Text()
+
+	fmt.Printf("Welcome to Go, %v %v\n", FirstName, LastName)
 }
