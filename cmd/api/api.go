@@ -1,38 +1,30 @@
 package main
 
 import (
-	"Todo-List-Go/internal/store"
 	"log"
 	"net/http"
 	"time"
+
+	"Todo-List-Go/internal/store"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
+// Main app struct
 type application struct {
 	config config
-	store  store.Storage // or *store.PostgreSQLStorage depending on your code
+	store  store.Storage
 }
 
-type config struct {
-	addr string
-}
-type dbConfig{
-addr string
-maxOpenConns int 
-maxIdleConns int 
-maxIdleTime string
-}
-
+// Setup routes
 func (app *application) mount() *chi.Mux {
 	r := chi.NewRouter()
 
-	// Add middleware
-	r.Use(middleware.Recoverer)
-	r.Use(middleware.RequestID)
-	r.Use(middleware.Logger)
+	// Middleware
+	r.Use(middleware.Recoverer, middleware.RequestID, middleware.Logger)
 
+	// Routes
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("welcome"))
 	})
@@ -40,6 +32,7 @@ func (app *application) mount() *chi.Mux {
 	return r
 }
 
+// Run HTTP server
 func (app *application) run(mux *chi.Mux) error {
 	srv := &http.Server{
 		Addr:         app.config.addr,
@@ -47,6 +40,7 @@ func (app *application) run(mux *chi.Mux) error {
 		WriteTimeout: 30 * time.Second,
 		ReadTimeout:  10 * time.Second,
 	}
-	log.Printf("Server is running on %s", app.config.addr)
+
+	log.Printf("Server running on %s", app.config.addr)
 	return srv.ListenAndServe()
 }
