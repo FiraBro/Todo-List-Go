@@ -3,34 +3,35 @@ package store
 import (
 	"context"
 	"database/sql"
+
+	"github.com/lib/pq"
 )
 
-type post struct{
-	ID string `json:"id"`
-	Title string `json:"title"`
-	Content string `json:"content"`
-	UserID int64 `json:"user_id"`
-	// Tags []string `json:"tags"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+type post struct {
+	ID        string   `json:"id"`
+	Title     string   `json:"title"`
+	Content   string   `json:"content"`
+	UserID    int64    `json:"user_id"`
+	Tags      []string `json:"tags"`
+	CreatedAt string   `json:"created_at"`
+	UpdatedAt string   `json:"updated_at"`
 }
-type postsSoter struct{
+type postStore struct {
 	db *sql.DB
 }
 
-
-func (s *postsSoter) Create(ctx context.Context,post *post) error {
-	query:=`
+func (s *postStore) Create(ctx context.Context, post *post) error {
+	query := `
 	INSERT INTO post (title, content, user_id)
-	VALUES ($1, $2, $3)
+	VALUES ($1, $2, $3,$4)
 	RETURNING id, created_at, updated_at
 	`
-	err:= s.db.QueryRowContext(ctx, query, post.Title, post.Content, post.UserID).Scan(
+	err := s.db.QueryRowContext(ctx, query, post.Title, post.Content, post.UserID, pq.Array(post.Tags)).Scan(
 		&post.ID,
 		&post.CreatedAt,
 		&post.UpdatedAt,
 	)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	return nil
